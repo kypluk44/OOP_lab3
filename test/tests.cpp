@@ -115,6 +115,11 @@ TEST(TrapezoidTest, InvalidTrapezoidThrows) {
     EXPECT_THROW(inputFigure(t, "0 0  2 1  3 4  1 5"), std::invalid_argument);
 }
 
+TEST(TrapezoidTest, LegsMustBeEqual) {
+    Trapezoid t;
+    EXPECT_THROW(inputFigure(t, "0 0  5 0  4 3  2 3"), std::invalid_argument);
+}
+
 TEST(TrapezoidTest, EqualityOperator) {
     Trapezoid t1;
     Trapezoid t2;

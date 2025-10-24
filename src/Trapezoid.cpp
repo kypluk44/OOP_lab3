@@ -50,20 +50,33 @@ bool Trapezoid::validate() const {
     const double area = surface();
     if (area < EPS) return false;
 
-    const auto v0 = makeVec(vertices[0], vertices[1]);
-    const auto v1 = makeVec(vertices[1], vertices[2]);
-    const auto v2 = makeVec(vertices[2], vertices[3]);
-    const auto v3 = makeVec(vertices[3], vertices[0]);
+    const auto v01 = makeVec(vertices[0], vertices[1]);
+    const auto v12 = makeVec(vertices[1], vertices[2]);
+    const auto v23 = makeVec(vertices[2], vertices[3]);
+    const auto v30 = makeVec(vertices[3], vertices[0]);
 
-    if (lengthSq(v0) < EPS || lengthSq(v1) < EPS ||
-        lengthSq(v2) < EPS || lengthSq(v3) < EPS) {
+    if (lengthSq(v01) < EPS || lengthSq(v12) < EPS ||
+        lengthSq(v23) < EPS || lengthSq(v30) < EPS) {
         return false;
     }
 
-    const bool parallel01_23 = almostEqual(cross(v0, v2), 0.0);
-    const bool parallel12_30 = almostEqual(cross(v1, v3), 0.0);
+    const bool base01_23 = almostEqual(cross(v01, v23), 0.0);
+    const bool base12_30 = almostEqual(cross(v12, v30), 0.0);
 
-    if (!(parallel01_23 || parallel12_30)) return false;
+    if (base01_23 && base12_30) return false; // параллелограмм, а не трапеция
+    if (!base01_23 && !base12_30) return false;
+
+    if (base01_23) {
+        const double leg1 = vertices[1].distanceTo(vertices[2]);
+        const double leg2 = vertices[3].distanceTo(vertices[0]);
+        if (!almostEqual(leg1, leg2)) return false;
+        if (almostEqual(vertices[0].distanceTo(vertices[1]), vertices[2].distanceTo(vertices[3]))) return false;
+    } else {
+        const double leg1 = vertices[2].distanceTo(vertices[3]);
+        const double leg2 = vertices[0].distanceTo(vertices[1]);
+        if (!almostEqual(leg1, leg2)) return false;
+        if (almostEqual(vertices[1].distanceTo(vertices[2]), vertices[3].distanceTo(vertices[0]))) return false;
+    }
 
     return true;
 }
